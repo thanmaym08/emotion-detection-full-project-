@@ -1,0 +1,32 @@
+# Ignore Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Ignore virtual environments
+face_emotion_env/
+.venv/
+env/
+venv/
+
+# Ignore model checkpoints
+#*.pth
+#*.pt
+
+# Ignore dataset folders
+data/
+cleaned_data/
+corrupt/
+
+# Jupyter Notebook checkpoints (if you use notebooks later)
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VSCode settings (optional)
+.vscode/
+
+# Logs
+*.log

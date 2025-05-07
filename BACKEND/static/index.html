@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+
+        video {
+            width: 80%;
+            max-width: 400px;
+            border: 2px solid black;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            display: none;
+        }
+
+        #prediction {
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Real-time Emotion Detection</h1>
+    <video id="video" autoplay></video>
+    <br>
+    <button id="capture-btn">Capture Emotion</button>
+    <canvas id="canvas"></canvas>
+    <div id="prediction"></div>
+
+    <script>
+        // Set up webcam stream
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('capture-btn');
+        const predictionDiv = document.getElementById('prediction');
+
+        const constraints = {
+            video: {
+                facingMode: 'user',
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            }
+        };
+
+        // Start the webcam
+        async function startWebcam() {
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            video.srcObject = stream;
+        }
+
+        // Capture a frame from webcam
+        captureBtn.addEventListener('click', () => {
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/png');
+
+            // Send the image to backend for prediction
+            fetch('/predict', {
+                method: 'POST',
+                body: JSON.stringify({ image: imageData }),
+                headers: { 'Content-Type': 'application/json' }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    predictionDiv.textContent = `Prediction: ${data.prediction}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    predictionDiv.textContent = 'Error predicting emotion.';
+                });
+        });
+
+        startWebcam();
+    </script>
+</body>
+
+</html>
